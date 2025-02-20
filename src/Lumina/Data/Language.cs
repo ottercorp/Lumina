@@ -33,7 +33,7 @@ namespace Lumina.Data
 
         public static string GetLanguageStr( Language lang )
         {
-            return LanguageMap[ lang ];
+            return lang == Language.None ? "" : "chs";
         }
     }
 }
