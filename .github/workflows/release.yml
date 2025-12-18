@@ -11,19 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v6.0.0
       with:
         fetch-depth: 0
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '7.0.x'
+        dotnet-version: '10.0.x'
     - name: Build with dotnet
       run: dotnet build --configuration Release --nologo ./src/Lumina.sln
     - name: dotnet test
       run: dotnet test --configuration Release --nologo ./src/Lumina.sln
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v5
       with:
         name: Lumina-${{ matrix.os }}
         path: |
@@ -35,13 +35,10 @@ jobs:
           ./src/Lumina/bin/Release/**/Lumina*.deps.json
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Lumina ${{ github.ref }}
-        draft: false
-        prerelease: false
+        name: Lumina ${{ github.ref }}
     - name: publish nuget package
       run: dotnet nuget push ./src/Lumina/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate

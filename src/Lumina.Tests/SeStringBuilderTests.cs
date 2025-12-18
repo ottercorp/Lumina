@@ -295,12 +295,14 @@ public class SeStringBuilderTests
                 .PopColorType()
                 .PopEdgeColorType()
                 .ToReadOnlySeString();
-        _outputHelper.WriteLine( test.ToString() );
+        _outputHelper.WriteLine( test.ToMacroString() );
     }
 
     [Sheet( "Addon" )]
     public readonly struct Addon( ExcelPage page, uint offset, uint row ) : IExcelRow< Addon >
     {
+        public ExcelPage ExcelPage => page;
+        public uint RowOffset => offset;
         public uint RowId => row;
 
         public ReadOnlySeString Text => page.ReadString( offset, offset );
@@ -470,7 +472,7 @@ public class SeStringBuilderTests
             new SeStringBuilder()
                 .Append( $"Left:{0x1234,-8:X}\nRight:{0x1234,8:X}\n{test}\nint*: 0x{(void*) 0x12345678:X16}" )
                 .ToReadOnlySeString()
-                .ToString() );
+                .ToMacroString() );
     }
 
     [Fact]
@@ -482,7 +484,7 @@ public class SeStringBuilderTests
             new SeStringBuilder()
                 .Append( $"|{"Left",-8}|\n|{"Right"u8,8}|\n{boldHello}\n{(object) null}" )
                 .ToReadOnlySeString()
-                .ToString() );
+                .ToMacroString() );
     }
 
     [Fact]
@@ -492,7 +494,7 @@ public class SeStringBuilderTests
             new SeStringBuilder()
                 .Append( $"{"<italic(1)>test<italic(0)>":m}" )
                 .ToReadOnlySeString()
-                .ToString() );
+                .ToMacroString() );
 
     [Fact]
     public void ThrowsOnInvalidMacroStrings1() =>
@@ -529,7 +531,7 @@ public class SeStringBuilderTests
         {
             Assert.Equal(
                 $"{i}<string({i})>{i}<string(<string({i})>)>{i}",
-                ReadOnlySeString.FromMacroString( $"{i}<string({i})>{i}<string(<string({i})>)>{i}" ).ToString() );
+                ReadOnlySeString.FromMacroString( $"{i}<string({i})>{i}<string(<string({i})>)>{i}" ).ToMacroString() );
         }
     }
 
@@ -678,7 +680,7 @@ public class SeStringBuilderTests
                         ReadOnlySeString test2;
                         try
                         {
-                            test2 = ssb.Clear().AppendMacroString( test1.ToString() ).ToReadOnlySeString();
+                            test2 = ssb.Clear().AppendMacroString( test1.ToMacroString() ).ToReadOnlySeString();
                         }
                         catch( Exception e )
                         {
@@ -695,6 +697,8 @@ public class SeStringBuilderTests
     [Sheet]
     public readonly struct RawRow( ExcelPage page, uint offset, uint row ) : IExcelRow< RawRow >
     {
+        public ExcelPage ExcelPage => page;
+        public uint RowOffset => offset;
         public uint RowId => row;
 
         public ReadOnlySeString ReadString( ushort off ) =>
